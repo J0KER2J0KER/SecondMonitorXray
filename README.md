@@ -4,7 +4,7 @@ After the game boots up, a second window opens, which can be placed whereever yo
 
 With that you are able to share your screen and xray at the same time without anyone noticing.
 
-Download on Modrinth: N/A
+Download on Modrinth: https://modrinth.com/mod/second-monitor-xray
 
 Download on Github: https://github.com/J0KER2J0KER/SecondMonitorXray/releases/latest
 
