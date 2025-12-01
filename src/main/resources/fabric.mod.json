@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "second_monitor_xray",
+  "version": "${version}",
+  "name": "SecondMonitorXray",
+  "description": "Allows you to Xray on your Second Monitor.",
+  "authors": [],
+  "contact": {},
+  "license": "GPL-3.0",
+  "icon": "assets/second_monitor_xray/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-datagen": [
+      "com.j0ker2j0ker.second_monitor_xray.client.SecondMonitorXrayDataGenerator"
+    ],
+    "client": [
+      "com.j0ker2j0ker.second_monitor_xray.client.SecondMonitorXrayClient"
+    ],
+    "main": [
+      "com.j0ker2j0ker.second_monitor_xray.SecondMonitorXray"
+    ]
+  },
+  "mixins": [
+    "second_monitor_xray.mixins.json",
+    {
+      "config": "second_monitor_xray.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
