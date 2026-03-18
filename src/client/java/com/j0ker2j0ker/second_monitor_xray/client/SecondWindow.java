@@ -2,11 +2,11 @@ package com.j0ker2j0ker.second_monitor_xray.client;
 
 import com.j0ker2j0ker.second_monitor_xray.client.utils.Cube;
 import com.j0ker2j0ker.second_monitor_xray.client.utils.TextureLoader;
-import net.minecraft.block.Block;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.Vec3i;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -64,8 +64,8 @@ public class SecondWindow {
 
     public void updateCubes(){
         cubes.clear();
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null || client.world == null) {
+        Minecraft client = Minecraft.getInstance();
+        if (client.player == null || client.level == null) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -79,8 +79,8 @@ public class SecondWindow {
 
         for (int cx = playerChunkX - chunkDistance; cx <= playerChunkX + chunkDistance; cx++) {
             for (int cz = playerChunkZ - chunkDistance; cz <= playerChunkZ + chunkDistance; cz++) {
-                if(client.world == null) return;
-                var chunk = client.world.getChunk(cx, cz);
+                if(client.level == null) return;
+                var chunk = client.level.getChunk(cx, cz);
 
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
@@ -102,7 +102,7 @@ public class SecondWindow {
     }
 
     private void renderCubesWithPlayerCamera() {
-        MinecraftClient client = MinecraftClient.getInstance();
+        Minecraft client = Minecraft.getInstance();
         if (client.player == null) return;
 
         int[] width = new int[1], height = new int[1];
@@ -112,7 +112,7 @@ public class SecondWindow {
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
         float aspect = (float) width[0] / height[0];
-        float fov = client.options.getFov().getValue();
+        float fov = client.options.fov().get();
         float near = 0.1f, far = 1000f;
         float top = (float) Math.tan(Math.toRadians(fov / 2)) * near;
         float bottom = -top;
@@ -123,9 +123,9 @@ public class SecondWindow {
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadIdentity();
 
-        Vec3d pos = client.player.getEntityPos();
-        float yaw = client.player.getYaw();
-        float pitch = client.player.getPitch();
+        Vec3 pos = client.player.position();
+        float yaw = client.player.getYRot();
+        float pitch = client.player.getXRot();
 
         GL11.glRotated(pitch, 1, 0, 0);
         GL11.glRotated((yaw + 180), 0, 1, 0);
@@ -193,33 +193,33 @@ public class SecondWindow {
         return TextureLoader.blockTextures.containsKey(block);
     }
 
-    private boolean isInFrustum(double cx, double cy, double cz, MinecraftClient client) {
+    private boolean isInFrustum(double cx, double cy, double cz, Minecraft client) {
         var player = client.player;
         if (player == null) return false;
 
-        Vec3d camPos = player.getCameraPosVec(1.0f);
+        Vec3 camPos = player.getEyePosition(1.0f);
 
         double dx = (cx + 0.5) - camPos.x;
         double dy = (cy + 0.5) - camPos.y;
         double dz = (cz + 0.5) - camPos.z;
-        Vec3d toCube = new Vec3d(dx, dy, dz).normalize();
+        Vec3 toCube = new Vec3(dx, dy, dz).normalize();
 
-        float yaw = player.getYaw();
-        float pitch = player.getPitch();
+        float yaw = player.getYRot();
+        float pitch = player.getXRot();
 
         double yawRad = Math.toRadians(-yaw);
         double pitchRad = Math.toRadians(-pitch);
 
-        Vec3d forward = new Vec3d(
+        Vec3 forward = new Vec3(
                 Math.sin(yawRad) * Math.cos(pitchRad),
                 Math.sin(pitchRad),
                 Math.cos(yawRad) * Math.cos(pitchRad)
         ).normalize();
 
-        float fov = client.options.getFov().getValue();
+        float fov = client.options.fov().get();
         double cosFov = Math.cos(Math.toRadians(fov));
 
-        return forward.dotProduct(toCube) > cosFov;
+        return forward.dot(toCube) > cosFov;
     }
 
 }
